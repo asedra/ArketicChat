@@ -1,0 +1,33 @@
+# ATTILA AI Enhanced Function Management System Rules
+
+## Project Context
+- This is an enhancement of existing ATTILA AI chat application
+- Goal: Transform into sophisticated function orchestration platform
+- Target: <2s execution time, >90% AI router accuracy
+- Stack: FastAPI + SvelteKit + SQLite/PostgreSQL
+
+## Development Priorities
+1. Performance optimization (target <2s execution)
+2. AI router accuracy (target >90%)
+3. Multi-function coordination (1-5 simultaneous)
+4. Real-time monitoring and analytics
+5. Visual function builder for non-technical users
+
+## Code Standards
+- Backend: Python 3.11+, FastAPI, SQLAlchemy, Pydantic
+- Frontend: SvelteKit, TypeScript, Tailwind CSS
+- Testing: >90% coverage requirement
+- Documentation: Update for all new features
+
+## Implementation Phases
+Phase 1: Database enhancement + AI router
+Phase 2: Function executors + API endpoints  
+Phase 3: Frontend components + chat enhancement
+Phase 4: Performance optimization + deployment
+
+## Critical Requirements
+- Maintain backward compatibility with existing chat
+- Follow security best practices
+- Implement comprehensive error handling
+- Add performance monitoring and analytics
+- Support for 4 function types: MCP, API, Prompt, Document
