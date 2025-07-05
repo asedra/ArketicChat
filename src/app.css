@@ -1,0 +1,318 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* ATTILA AI Enhanced Function Management System - Global Styles */
+
+@layer base {
+  html {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+  
+  body {
+    @apply antialiased;
+  }
+  
+  /* Custom focus styles */
+  :focus {
+    @apply outline-none ring-2 ring-blue-500 ring-opacity-50;
+  }
+  
+  /* Improved form elements */
+  input, textarea, select {
+    @apply transition-colors duration-200;
+  }
+  
+  input:focus, textarea:focus, select:focus {
+    @apply ring-2 ring-blue-500 ring-opacity-50;
+  }
+}
+
+@layer components {
+  /* Button Variants */
+  .btn-primary {
+    @apply bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50;
+  }
+  
+  .btn-secondary {
+    @apply bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-900 dark:text-slate-100 font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+  }
+  
+  .btn-danger {
+    @apply bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:ring-2 focus:ring-red-500 focus:ring-opacity-50;
+  }
+  
+  .btn-success {
+    @apply bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:ring-2 focus:ring-green-500 focus:ring-opacity-50;
+  }
+  
+  .btn-outline {
+    @apply border-2 border-slate-300 dark:border-slate-600 hover:border-slate-400 dark:hover:border-slate-500 text-slate-700 dark:text-slate-300 font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+  }
+  
+  /* Card Components */
+  .card {
+    @apply bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 p-6;
+  }
+  
+  .card-compact {
+    @apply bg-white dark:bg-slate-800 rounded-lg shadow border border-slate-200 dark:border-slate-700 p-4;
+  }
+  
+  /* Form Components */
+  .form-input {
+    @apply w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200;
+  }
+  
+  .form-textarea {
+    @apply w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 resize-vertical min-h-[100px];
+  }
+  
+  .form-select {
+    @apply w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200;
+  }
+  
+  .form-label {
+    @apply block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2;
+  }
+  
+  .form-error {
+    @apply text-red-600 dark:text-red-400 text-sm mt-1;
+  }
+  
+  /* Badge Components */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  
+  .badge-primary {
+    @apply bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200;
+  }
+  
+  .badge-success {
+    @apply bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200;
+  }
+  
+  .badge-warning {
+    @apply bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200;
+  }
+  
+  .badge-danger {
+    @apply bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200;
+  }
+  
+  .badge-gray {
+    @apply bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200;
+  }
+  
+  /* Navigation Components */
+  .nav-link {
+    @apply text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200;
+  }
+  
+  .nav-link-active {
+    @apply text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/50 px-3 py-2 rounded-md text-sm font-medium;
+  }
+  
+  /* Status Indicators */
+  .status-indicator {
+    @apply inline-block w-2 h-2 rounded-full;
+  }
+  
+  .status-online {
+    @apply bg-green-500;
+  }
+  
+  .status-offline {
+    @apply bg-red-500;
+  }
+  
+  .status-pending {
+    @apply bg-yellow-500;
+  }
+  
+  .status-processing {
+    @apply bg-blue-500 animate-pulse;
+  }
+  
+  /* Chat Components */
+  .chat-message {
+    @apply max-w-3xl mx-auto mb-4 px-4;
+  }
+  
+  .chat-message-user {
+    @apply ml-12;
+  }
+  
+  .chat-message-assistant {
+    @apply mr-12;
+  }
+  
+  .chat-bubble {
+    @apply rounded-lg px-4 py-3 shadow-sm;
+  }
+  
+  .chat-bubble-user {
+    @apply bg-blue-600 text-white ml-auto;
+  }
+  
+  .chat-bubble-assistant {
+    @apply bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-slate-700;
+  }
+  
+  /* Function Components */
+  .function-card {
+    @apply bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-4 hover:shadow-md transition-shadow duration-200 cursor-pointer;
+  }
+  
+  .function-card:hover {
+    @apply border-blue-300 dark:border-blue-600;
+  }
+  
+  .function-card-selected {
+    @apply border-blue-500 ring-2 ring-blue-500 ring-opacity-20;
+  }
+  
+  /* Performance Metrics */
+  .metric-card {
+    @apply bg-gradient-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg p-6;
+  }
+  
+  .metric-value {
+    @apply text-2xl font-bold text-slate-900 dark:text-slate-100;
+  }
+  
+  .metric-label {
+    @apply text-sm text-slate-600 dark:text-slate-400 font-medium;
+  }
+  
+  .metric-change {
+    @apply text-sm font-medium;
+  }
+  
+  .metric-change-positive {
+    @apply text-green-600 dark:text-green-400;
+  }
+  
+  .metric-change-negative {
+    @apply text-red-600 dark:text-red-400;
+  }
+  
+  /* Loading States */
+  .skeleton {
+    @apply animate-pulse bg-slate-200 dark:bg-slate-700 rounded;
+  }
+  
+  .loading-overlay {
+    @apply absolute inset-0 bg-white/75 dark:bg-slate-900/75 flex items-center justify-center rounded-lg;
+  }
+  
+  /* Scrollable Areas */
+  .scrollable {
+    @apply overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600 scrollbar-track-transparent;
+  }
+  
+  /* Animation Utilities */
+  .fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  
+  .slide-in-right {
+    animation: slideInRight 0.3s ease-out;
+  }
+  
+  .slide-in-up {
+    animation: slideInUp 0.3s ease-out;
+  }
+}
+
+@layer utilities {
+  /* Custom utilities */
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+  
+  .scrollbar-thumb-slate-300 {
+    scrollbar-color: rgb(203 213 225) transparent;
+  }
+  
+  .dark .scrollbar-thumb-slate-600 {
+    scrollbar-color: rgb(71 85 105) transparent;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInRight {
+  from { 
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInUp {
+  from { 
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Progress bars */
+.progress-bar {
+  @apply w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2;
+}
+
+.progress-fill {
+  @apply bg-blue-600 h-2 rounded-full transition-all duration-300 ease-out;
+}
+
+/* Code blocks */
+.code-block {
+  @apply bg-slate-900 text-slate-100 rounded-lg p-4 overflow-x-auto;
+}
+
+.code-inline {
+  @apply bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-1.5 py-0.5 rounded text-sm font-mono;
+}
+
+/* Responsive helpers */
+@media (max-width: 640px) {
+  .mobile-full {
+    @apply w-full;
+  }
+  
+  .mobile-hidden {
+    @apply hidden;
+  }
+  
+  .mobile-stack {
+    @apply flex-col space-x-0 space-y-2;
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-break {
+    page-break-after: always;
+  }
+}

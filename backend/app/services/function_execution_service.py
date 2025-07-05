@@ -273,17 +273,40 @@ class FunctionExecutionService:
             # Mark as running
             execution_record.start_execution()
             
-            # Execute based on function type
+            # Extract parameters from context
+            parameters = context.get('parameters', {}) if context else {}
+            
+            # Execute based on function type using dedicated executors
             if func.function_type == "basic":
-                result = await self._execute_basic_function(func, context)
+                result = await self._execute_basic_function(func, parameters, context)
             elif func.function_type == "api":
-                result = await self._execute_api_function(func, context)
+                from .executors.api_executor import APIExecutor
+                executor = APIExecutor()
+                try:
+                    result = await executor.execute(func, parameters, context)
+                finally:
+                    await executor.close()
             elif func.function_type == "prompt":
-                result = await self._execute_prompt_function(func, context)
+                from .executors.prompt_executor import PromptExecutor
+                executor = PromptExecutor()
+                try:
+                    result = await executor.execute(func, parameters, context)
+                finally:
+                    await executor.close()
             elif func.function_type == "document":
-                result = await self._execute_document_function(func, context)
+                from .executors.document_executor import DocumentExecutor
+                executor = DocumentExecutor()
+                try:
+                    result = await executor.execute(func, parameters, context)
+                finally:
+                    await executor.close()
             elif func.function_type == "mcp":
-                result = await self._execute_mcp_function(func, context)
+                from .executors.mcp_executor import MCPExecutor
+                executor = MCPExecutor()
+                try:
+                    result = await executor.execute(func, parameters, context)
+                finally:
+                    await executor.close()
             else:
                 raise ValueError(f"Unsupported function type: {func.function_type}")
             
@@ -332,6 +355,7 @@ class FunctionExecutionService:
     async def _execute_basic_function(
         self, 
         func: Function, 
+        parameters: Dict[str, Any],
         context: Optional[Dict[str, Any]]
     ) -> Dict[str, Any]:
         """Execute a basic function"""
@@ -341,10 +365,18 @@ class FunctionExecutionService:
         await asyncio.sleep(0.1)  # Simulate processing time
         
         return {
-            "function_name": func.name,
-            "result": f"Basic function {func.name} executed successfully",
-            "parameters": func.parameters,
-            "context": context
+            "success": True,
+            "result": {
+                "function_name": func.name,
+                "message": f"Basic function {func.name} executed successfully",
+                "parameters": parameters,
+                "function_parameters": func.parameters,
+                "context": context
+            },
+            "metadata": {
+                "execution_time": 0.1,
+                "function_type": "basic"
+            }
         }
     
     async def _execute_api_function(
