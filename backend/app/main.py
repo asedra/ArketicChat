@@ -16,6 +16,7 @@ from .core.config import settings
 from .core.database import init_db, get_async_db_dependency, check_database_health
 from .services.function_router_service import FunctionRouterService
 from .services.function_execution_service import FunctionExecutionService
+from .services.analytics_service import AnalyticsService
 from .models.function import Function, FunctionCreate, FunctionUpdate, FunctionResponse
 from .models.function_router import FunctionRouter, FunctionRouterCreate, FunctionRouterUpdate, FunctionRouterResponse
 from .models.function_execution import FunctionExecution, FunctionExecutionResponse
@@ -43,6 +44,7 @@ async def lifespan(app: FastAPI):
         # Initialize services
         app.state.router_service = FunctionRouterService()
         app.state.execution_service = FunctionExecutionService()
+        app.state.analytics_service = AnalyticsService()
         logger.info("Services initialized successfully")
         
         logger.info("Application startup complete")
@@ -486,8 +488,242 @@ async def get_performance_metrics(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.get("/analytics/comprehensive", tags=["Analytics"])
+async def get_comprehensive_analytics(
+    period_hours: int = 24,
+    db: AsyncSession = Depends(get_async_db_dependency)
+):
+    """Get comprehensive analytics report"""
+    try:
+        analytics_service = app.state.analytics_service
+        report = await analytics_service.generate_analytics_report(period_hours=period_hours)
+        
+        return {
+            "report": {
+                "period_start": report.period_start.isoformat(),
+                "period_end": report.period_end.isoformat(),
+                "summary": report.summary,
+                "performance_metrics": report.performance_metrics,
+                "usage_statistics": report.usage_statistics,
+                "error_analysis": report.error_analysis,
+                "recommendations": report.recommendations
+            },
+            "generated_at": datetime.now().isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting comprehensive analytics: {e}")
+        # Return mock data as fallback
+        return {
+            "report": {
+                "period_start": (datetime.now() - timedelta(hours=period_hours)).isoformat(),
+                "period_end": datetime.now().isoformat(),
+                "summary": {
+                    "period_hours": period_hours,
+                    "total_executions": 0,
+                    "success_rate": 0,
+                    "active_functions": 0,
+                    "system_uptime": "Unknown",
+                    "health_status": "unknown"
+                },
+                "performance_metrics": {
+                    "total_executions": 0,
+                    "avg_execution_time": 0,
+                    "p95_execution_time": 0,
+                    "p99_execution_time": 0,
+                    "fastest_execution": 0,
+                    "slowest_execution": 0,
+                    "throughput_per_hour": 0,
+                    "performance_trend": []
+                },
+                "usage_statistics": {
+                    "function_type_distribution": {},
+                    "popular_functions": [],
+                    "router_accuracy": 0,
+                    "total_router_decisions": 0,
+                    "hourly_usage_pattern": {},
+                    "peak_usage_hour": 0
+                },
+                "error_analysis": {
+                    "total_executions": 0,
+                    "total_failures": 0,
+                    "error_rate": 0,
+                    "error_categories": {},
+                    "error_by_function": [],
+                    "mttr": 0
+                },
+                "recommendations": [
+                    "System monitoring initialized. Start using functions to generate insights."
+                ]
+            },
+            "generated_at": datetime.now().isoformat(),
+            "note": "Analytics service not available, showing mock data"
+        }
+
+
+@app.get("/analytics/realtime", tags=["Analytics"])
+async def get_realtime_metrics():
+    """Get real-time system metrics"""
+    try:
+        analytics_service = app.state.analytics_service
+        metrics = await analytics_service.get_real_time_metrics()
+        
+        return metrics
+        
+    except Exception as e:
+        logger.error(f"Error getting real-time metrics: {e}")
+        # Return mock data as fallback
+        return {
+            "timestamp": datetime.now().isoformat(),
+            "system_metrics": {
+                "cpu_usage_percent": 0,
+                "memory_usage_percent": 0,
+                "memory_available_gb": 0,
+                "disk_usage_percent": 0,
+                "disk_free_gb": 0,
+                "system_health_score": 0
+            },
+            "recent_executions": 0,
+            "recent_success_rate": 0,
+            "current_throughput": 0,
+            "alerts": [],
+            "note": "Analytics service not available, showing mock data"
+        }
+
+
+@app.get("/analytics/usage", tags=["Analytics"])
+async def get_usage_analytics(
+    period_hours: int = 24,
+    db: AsyncSession = Depends(get_async_db_dependency)
+):
+    """Get usage analytics and patterns"""
+    try:
+        from sqlalchemy import select, func
+        from datetime import datetime, timedelta
+        
+        cutoff_date = datetime.now() - timedelta(hours=period_hours)
+        
+        # Get function usage by type
+        function_usage = await db.execute(
+            select(
+                Function.function_type,
+                func.count(FunctionExecution.id).label('usage_count')
+            )
+            .join(FunctionExecution, Function.id == FunctionExecution.function_id)
+            .where(FunctionExecution.created_at >= cutoff_date)
+            .group_by(Function.function_type)
+        )
+        
+        usage_by_type = {row.function_type: row.usage_count for row in function_usage.all()}
+        
+        # Get most used functions
+        popular_functions = await db.execute(
+            select(
+                Function.name,
+                Function.function_type,
+                func.count(FunctionExecution.id).label('usage_count')
+            )
+            .join(FunctionExecution, Function.id == FunctionExecution.function_id)
+            .where(FunctionExecution.created_at >= cutoff_date)
+            .group_by(Function.id, Function.name, Function.function_type)
+            .order_by(func.count(FunctionExecution.id).desc())
+            .limit(10)
+        )
+        
+        popular_list = [
+            {
+                "name": row.name,
+                "type": row.function_type,
+                "usage_count": row.usage_count
+            }
+            for row in popular_functions.all()
+        ]
+        
+        return {
+            "usage_analytics": {
+                "function_type_distribution": usage_by_type,
+                "popular_functions": popular_list,
+                "period_hours": period_hours,
+                "total_unique_functions": len(popular_list)
+            },
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting usage analytics: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/analytics/errors", tags=["Analytics"])
+async def get_error_analytics(
+    period_hours: int = 24,
+    db: AsyncSession = Depends(get_async_db_dependency)
+):
+    """Get error analytics and patterns"""
+    try:
+        from sqlalchemy import select, func
+        from datetime import datetime, timedelta
+        
+        cutoff_date = datetime.now() - timedelta(hours=period_hours)
+        
+        # Get error statistics
+        error_stats = await db.execute(
+            select(
+                func.count(FunctionExecution.id).label('total_executions'),
+                func.sum(
+                    func.case([(FunctionExecution.status == 'failed', 1)], else_=0)
+                ).label('failed_executions')
+            ).where(FunctionExecution.created_at >= cutoff_date)
+        )
+        
+        stats = error_stats.first()
+        total_executions = stats.total_executions or 0
+        failed_executions = stats.failed_executions or 0
+        error_rate = failed_executions / total_executions if total_executions > 0 else 0
+        
+        # Get error messages
+        error_messages = await db.execute(
+            select(FunctionExecution.error_message)
+            .where(
+                FunctionExecution.created_at >= cutoff_date,
+                FunctionExecution.status == 'failed',
+                FunctionExecution.error_message.isnot(None)
+            )
+        )
+        
+        # Categorize errors
+        error_categories = {}
+        for row in error_messages.all():
+            error_msg = row.error_message.lower()
+            if 'timeout' in error_msg:
+                error_categories['timeout'] = error_categories.get('timeout', 0) + 1
+            elif 'authentication' in error_msg or 'unauthorized' in error_msg:
+                error_categories['authentication'] = error_categories.get('authentication', 0) + 1
+            elif 'connection' in error_msg or 'network' in error_msg:
+                error_categories['network'] = error_categories.get('network', 0) + 1
+            elif 'validation' in error_msg or 'invalid' in error_msg:
+                error_categories['validation'] = error_categories.get('validation', 0) + 1
+            else:
+                error_categories['other'] = error_categories.get('other', 0) + 1
+        
+        return {
+            "error_analytics": {
+                "total_executions": total_executions,
+                "failed_executions": failed_executions,
+                "error_rate": error_rate,
+                "error_categories": error_categories,
+                "period_hours": period_hours
+            },
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting error analytics: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # Import necessary modules for datetime
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import List, Optional
 
 
